@@ -1,0 +1,10 @@
+import {mkdirSync,writeFileSync} from 'node:fs';
+import {join,dirname} from 'node:path';
+import {pathToFileURL} from 'node:url';
+import {createHash} from 'node:crypto';
+const source=Buffer.from(process.env.APP_SOURCE_BASE64??'','base64');
+if(!source.length||createHash('sha256').update(source).digest('hex')!==process.env.APP_SOURCE_SHA256)throw new Error('Application source missing or invalid');
+const entry=join(process.cwd(),'.application','server.mjs');
+mkdirSync(dirname(entry),{recursive:true});writeFileSync(entry,source,{mode:0o600});
+process.argv[1]=entry;
+await import(pathToFileURL(entry).href);
