@@ -2,6 +2,15 @@ import {mkdirSync,writeFileSync} from 'node:fs';
 import {join,dirname} from 'node:path';
 import {pathToFileURL} from 'node:url';
 import {createHash} from 'node:crypto';
+const diagnostics={
+  sourceParts: Boolean(process.env.APP_SOURCE_PARTS||process.env.APP_SOURCE_BASE64),
+  sourceDigest: Boolean(process.env.APP_SOURCE_SHA256),
+  serviceAccount: Boolean(process.env.INTERCOM_SERVICE_ACCOUNT),
+  mercadoPagoToken: Boolean(process.env.MERCADOPAGO_ACCESS_TOKEN),
+  mercadoPagoWebhook: Boolean(process.env.MERCADOPAGO_WEBHOOK_SECRET),
+  firebasePush: Boolean(process.env.GOOGLE_APPLICATION_CREDENTIALS||process.env.INTERCOM_SERVICE_ACCOUNT)
+};
+console.log('OMNIA startup configuration presence (no secret values): '+JSON.stringify(diagnostics));
 const count=Number(process.env.APP_SOURCE_PARTS||0);
 if(!Number.isSafeInteger(count)||count<0||count>16)throw new Error('Invalid source part count');
 const encoded=count?Array.from({length:count},(_,index)=>process.env[`APP_SOURCE_${index}`]??'').join(''):process.env.APP_SOURCE_BASE64??'';
